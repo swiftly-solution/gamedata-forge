@@ -1,7 +1,9 @@
 using GameData.Tier0.Shared.CommandLine;
+using GameData.Tier0.Shared.Interfaces;
 
 namespace GameData.Tier0.Core.CommandLine;
 
+[ExposeInterface(InterfaceNames.CommandLine)]
 internal class CCommandLine : ICommandLine
 {
     private string _commandLine = "";

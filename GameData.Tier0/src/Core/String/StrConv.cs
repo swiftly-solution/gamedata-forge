@@ -1,8 +1,10 @@
+using GameData.Tier0.Shared.Interfaces;
 using GameData.Tier0.Shared.String;
 
 namespace GameData.Tier0.Core.String;
 
-public class CStrConv : IStrConv
+[ExposeInterface(InterfaceNames.StrConv)]
+internal class CStrConv : IStrConv
 {
     public T Convert<T>(string str, T defaultValue = default) where T : unmanaged
     {
