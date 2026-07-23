@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>GameData.Forge</PackageId>
+    <Authors>Swiftly Solution</Authors>
+    <RootNamespace>GameData.Forge</RootNamespace>
+    <PackageProjectUrl>https://github.com/swiftly-solution/gamedata-forge</PackageProjectUrl>
+    <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+    
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <BaseOutputPath>build\</BaseOutputPath>
+    <OutputPath>$(BaseOutputPath)Release\GameData.Forge</OutputPath>
+    <AssemblyName>GameData.Forge</AssemblyName>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <PlatformTarget>x64</PlatformTarget>
+
+    <DebugType>portable</DebugType>
+
+    <DefaultItemExcludes>$(DefaultItemExcludes);**\obj\**;**\bin\**;build\**</DefaultItemExcludes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="GameData.App\GameData.App.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="**\*.cs" />
+  </ItemGroup>
+
+</Project>
