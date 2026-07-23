@@ -8,20 +8,11 @@ internal class CCommandLine : ICommandLine
     private List<string> _parameters = [];
     private Dictionary<string, string> _parameterValues = [];
 
-    public string GetCommandLineString()
-    {
-        return _commandLine;
-    }
+    public ulong ParameterCount => (ulong)_parameters.Count;
 
-    public ulong GetParameterCount()
-    {
-        return (ulong)_parameters.Count;
-    }
+    public List<string> Parameters => _parameters;
 
-    public List<string> GetParameters()
-    {
-        return _parameters;
-    }
+    public string CommandLineString => _commandLine;
 
     public string GetParameterValue(string parameter, string defaultValue = "")
     {

@@ -9,7 +9,7 @@ public interface ICommandLine
     public bool HasParameter(string parameter);
     public string GetParameterValue(string parameter, string defaultValue = "");
 
-    public ulong GetParameterCount();
-    public List<string> GetParameters();
-    public string GetCommandLineString();
+    public ulong ParameterCount { get; }
+    public List<string> Parameters { get; }
+    public string CommandLineString { get; }
 }
