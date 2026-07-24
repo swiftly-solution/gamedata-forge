@@ -22,9 +22,14 @@ internal sealed class CTier0Module : IModule
 
         logging.RegisterListener(new Logging.CSpectreLoggingListener());
 
+        var loggingConVars = new Logging.CLoggingConVars(logging);
+        logging.RegisterListener(loggingConVars);
+
         logging.RegisterChannel("General", color: new Color(220, 220, 220));
         logging.RegisterChannel("Console", LoggingChannelFlags.ConsoleOnly, color: new Color(150, 150, 150));
         logging.RegisterChannel("Developer", color: new Color(0, 200, 200));
+
+        loggingConVars.CreateGlobalConVar();
     }
 
     public void Shutdown()

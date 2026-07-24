@@ -113,6 +113,14 @@ internal sealed class CLoggingSystem : ILoggingSystem
     public bool IsChannelEnabled(int channelId, LoggingSeverity severity)
         => IsChannelEnabled(channelId, RequiredVerbosity(severity));
 
+    public string? GetChannelName(int channelId)
+    {
+        lock (_lock)
+        {
+            return GetChannelLocked(channelId)?.Name;
+        }
+    }
+
     public LoggingVerbosity GetChannelVerbosity(int channelId)
     {
         lock (_lock)

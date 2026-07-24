@@ -14,6 +14,8 @@ public interface ILoggingSystem
 
     int FindChannel(string name);
 
+    string? GetChannelName(int channelId);
+
     int ChannelCount { get; }
 
     void AddTagToChannel(int channelId, string tag);
