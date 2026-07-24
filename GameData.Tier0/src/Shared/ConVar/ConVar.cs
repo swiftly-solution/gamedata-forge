@@ -86,7 +86,32 @@ public sealed class ConVar<T> : IConVar
             return;
         }
 
+        if (typeof(T) == typeof(bool))
+        {
+            Value = (T)(object)ParseBool(value, (bool)(object)_value!);
+            return;
+        }
+
         Value = Parse(value);
+    }
+
+    private static bool ParseBool(string s, bool current)
+    {
+        switch (s.Trim().ToLowerInvariant())
+        {
+            case "1":
+            case "true":
+            case "on":
+            case "yes":
+                return true;
+            case "0":
+            case "false":
+            case "off":
+            case "no":
+                return false;
+            default:
+                return current;
+        }
     }
 
     private T Parse(string s)

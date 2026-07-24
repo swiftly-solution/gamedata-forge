@@ -2,6 +2,7 @@ using GameData.Tier0.Shared.ConVar;
 using GameData.Tier0.Shared.Drawing;
 using GameData.Tier0.Shared.Interfaces;
 using GameData.Tier0.Shared.Logging;
+using GameData.Tier0.Shared.Terminal;
 
 namespace GameData.Tier0.Core.Interfaces;
 
@@ -10,6 +11,8 @@ internal sealed class CTier0Module : IModule
     public void Init(IInterfaceSystem system)
     {
         system.GetInterface<IConVarSystem>(InterfaceNames.ConVar);
+        system.GetInterface<ITerminal>(InterfaceNames.Terminal);
+        Terminal.CTerminalCommands.Register();
 
         var logging = system.GetInterface<ILoggingSystem>(InterfaceNames.LoggingSystem);
         if (logging == null)

@@ -1,6 +1,7 @@
 using System.Text;
 using GameData.Tier0.Shared.Drawing;
 using GameData.Tier0.Shared.Logging;
+using GameData.Tier0.Shared.Terminal;
 using Spectre.Console;
 
 namespace GameData.Tier0.Core.Logging;
@@ -14,6 +15,21 @@ internal sealed class CSpectreLoggingListener : ILoggingListener
             return;
         }
 
+        string markup = BuildMarkup(context, message);
+
+        var writer = TerminalOutput.Writer;
+        if (writer != null)
+        {
+            writer(markup);
+        }
+        else
+        {
+            AnsiConsole.MarkupLine(markup);
+        }
+    }
+
+    private static string BuildMarkup(LoggingContext context, string message)
+    {
         var sb = new StringBuilder();
 
         string channelColor = context.Color.A == 0
@@ -40,7 +56,7 @@ internal sealed class CSpectreLoggingListener : ILoggingListener
             sb.Append(Markup.Escape(message));
         }
 
-        AnsiConsole.MarkupLine(sb.ToString());
+        return sb.ToString();
     }
 
     private static string SeverityColor(LoggingSeverity severity) => severity switch

@@ -6,4 +6,5 @@ public static class InterfaceNames
     public const string CommandLine = "ICommandLine001";
     public const string LoggingSystem = "ILoggingSystem001";
     public const string ConVar = "IConVarSystem001";
+    public const string Terminal = "ITerminal001";
 }
