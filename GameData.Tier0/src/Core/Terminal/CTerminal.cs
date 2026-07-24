@@ -32,6 +32,7 @@ internal sealed class CTerminal : ITerminal, ICommandSink
     private readonly IAnsiConsole _ansi;
     private bool _running;
     private string _input = string.Empty;
+    private int _caret;
     private int _suggestIndex = -1;
     private bool _inSuggestions;
     private int _historyIndex;
@@ -227,6 +228,7 @@ internal sealed class CTerminal : ITerminal, ICommandSink
                                 }
                                 _historyIndex = _history.Count;
                                 _input = string.Empty;
+                                _caret = 0;
                                 ClearSuggestions();
                                 _inSuggestions = false;
                                 Render();
@@ -234,14 +236,56 @@ internal sealed class CTerminal : ITerminal, ICommandSink
                             break;
 
                         case ConsoleKey.Backspace:
-                            if (_input.Length > 0)
+                            if (_caret > 0)
                             {
-                                _input = _input[..^1];
+                                _input = _input[..(_caret - 1)] + _input[_caret..];
+                                _caret--;
                                 _inSuggestions = false;
                                 _historyIndex = _history.Count;
                                 UpdateSuggestions();
                                 Render();
                             }
+                            break;
+
+                        case ConsoleKey.Delete:
+                            if (_caret < _input.Length)
+                            {
+                                _input = _input[.._caret] + _input[(_caret + 1)..];
+                                _inSuggestions = false;
+                                _historyIndex = _history.Count;
+                                UpdateSuggestions();
+                                Render();
+                            }
+                            break;
+
+                        case ConsoleKey.LeftArrow:
+                            if (_caret > 0)
+                            {
+                                _caret--;
+                                _inSuggestions = false;
+                                Render();
+                            }
+                            break;
+
+                        case ConsoleKey.RightArrow:
+                            if (_caret < _input.Length)
+                            {
+                                _caret++;
+                                _inSuggestions = false;
+                                Render();
+                            }
+                            break;
+
+                        case ConsoleKey.Home:
+                            _caret = 0;
+                            _inSuggestions = false;
+                            Render();
+                            break;
+
+                        case ConsoleKey.End:
+                            _caret = _input.Length;
+                            _inSuggestions = false;
+                            Render();
                             break;
 
                         case ConsoleKey.Tab:
@@ -304,7 +348,8 @@ internal sealed class CTerminal : ITerminal, ICommandSink
                         default:
                             if (!char.IsControl(key.KeyChar))
                             {
-                                _input += key.KeyChar;
+                                _input = _input[.._caret] + key.KeyChar + _input[_caret..];
+                                _caret++;
                                 _inSuggestions = false;
                                 _historyIndex = _history.Count;
                                 UpdateSuggestions();
@@ -545,12 +590,16 @@ internal sealed class CTerminal : ITerminal, ICommandSink
         _frame.Append($"{Csi}{bottom};1H{Csi}2K└{border}┘");
 
         string content = "> " + _input;
-        string shown = content.Length > inner ? content[^inner..] : content;
+        int caretPos = 2 + _caret;
+
+        int offset = inner > 0 && caretPos >= inner ? caretPos - inner + 1 : 0;
+        int available = Math.Max(0, content.Length - offset);
+        string shown = available > 0 ? content.Substring(offset, Math.Min(inner, available)) : "";
 
         _frame.Append($"{Csi}{mid};1H{Csi}2K│ {shown.PadRight(inner)} │");
 
         _cursorRow = mid;
-        _cursorCol = Math.Min(3 + shown.Length, Math.Max(3, width - 1));
+        _cursorCol = Math.Min(3 + (caretPos - offset), Math.Max(3, width - 1));
     }
 
     private void BuildHint(int height, int width)
@@ -598,6 +647,7 @@ internal sealed class CTerminal : ITerminal, ICommandSink
 
         _historyIndex = Math.Max(0, _historyIndex - 1);
         _input = _history[_historyIndex];
+        _caret = _input.Length;
         ClearSuggestions();
     }
 
@@ -619,6 +669,7 @@ internal sealed class CTerminal : ITerminal, ICommandSink
             _input = string.Empty;
         }
 
+        _caret = _input.Length;
         ClearSuggestions();
     }
 
@@ -627,6 +678,7 @@ internal sealed class CTerminal : ITerminal, ICommandSink
         string[] tokens = _input.Split(' ');
         tokens[^1] = suggestion;
         _input = string.Join(' ', tokens) + " ";
+        _caret = _input.Length;
         UpdateSuggestions();
     }
 
