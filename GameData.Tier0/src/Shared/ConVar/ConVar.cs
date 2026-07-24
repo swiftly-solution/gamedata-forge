@@ -55,44 +55,59 @@ public sealed class ConVar<T> : IConVar
     public T Value
     {
         get => _value;
-        set
+        set => SetValue(value, force: false);
+    }
+
+    private void SetValue(T value, bool force)
+    {
+        if (!force && Flags.HasFlag(ConVarFlags.ReadOnly))
         {
-            if (Flags.HasFlag(ConVarFlags.ReadOnly))
-            {
-                throw new InvalidOperationException($"ConVar '{Name}' is read-only and cannot be changed.");
-            }
-
-            T clamped = Clamp(value);
-            if (EqualityComparer<T>.Default.Equals(_value, clamped))
-            {
-                return;
-            }
-
-            T old = _value;
-            _value = clamped;
-
-            OnChanged?.Invoke(this, old, clamped);
-            ConVarRegistry.NotifyChanged(this);
+            throw new InvalidOperationException($"ConVar '{Name}' is read-only and cannot be changed.");
         }
+
+        T clamped = Clamp(value);
+        if (EqualityComparer<T>.Default.Equals(_value, clamped))
+        {
+            return;
+        }
+
+        T old = _value;
+        _value = clamped;
+
+        OnChanged?.Invoke(this, old, clamped);
+        ConVarRegistry.NotifyChanged(this);
     }
 
     public string ToStringValue() => _value?.ToString() ?? "";
 
-    public void SetFromString(string value)
+    public void SetFromString(string value) => SetFromString(value, force: false);
+
+    public void SetFromString(string value, bool force)
     {
         if (typeof(T) == typeof(string))
         {
-            Value = (T)(object)value;
+            SetValue((T)(object)value, force);
             return;
         }
 
         if (typeof(T) == typeof(bool))
         {
-            Value = (T)(object)ParseBool(value, (bool)(object)_value!);
+            SetValue((T)(object)ParseBool(value, (bool)(object)_value!), force);
             return;
         }
 
-        Value = Parse(value);
+        if (typeof(T).IsEnum)
+        {
+            if (Enum.TryParse(typeof(T), value, ignoreCase: true, out var parsed)
+                && parsed != null
+                && Enum.IsDefined(typeof(T), parsed))
+            {
+                SetValue((T)parsed, force);
+            }
+            return;
+        }
+
+        SetValue(Parse(value), force);
     }
 
     private static bool ParseBool(string s, bool current)

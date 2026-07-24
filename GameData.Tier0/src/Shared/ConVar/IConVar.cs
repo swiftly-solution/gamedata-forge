@@ -9,4 +9,5 @@ public interface IConVar
     bool HasBounds { get; }
     string ToStringValue();
     void SetFromString(string value);
+    void SetFromString(string value, bool force);
 }

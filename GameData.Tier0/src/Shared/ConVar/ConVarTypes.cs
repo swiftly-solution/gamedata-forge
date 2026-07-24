@@ -3,7 +3,8 @@ namespace GameData.Tier0.Shared.ConVar;
 public static class ConVarTypes
 {
     public static bool IsSupported(Type type)
-        => type == typeof(byte)
+        => type.IsEnum
+        || type == typeof(byte)
         || type == typeof(sbyte)
         || type == typeof(short)
         || type == typeof(ushort)
@@ -17,5 +18,5 @@ public static class ConVarTypes
         || type == typeof(string);
 
     public static bool IsNumeric(Type type)
-        => IsSupported(type) && type != typeof(bool) && type != typeof(string);
+        => IsSupported(type) && !type.IsEnum && type != typeof(bool) && type != typeof(string);
 }

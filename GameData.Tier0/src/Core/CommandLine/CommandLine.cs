@@ -1,5 +1,7 @@
 using GameData.Tier0.Shared.CommandLine;
+using GameData.Tier0.Shared.ConVar;
 using GameData.Tier0.Shared.Interfaces;
+using GameData.Tier0.Shared.Terminal;
 
 namespace GameData.Tier0.Core.CommandLine;
 
@@ -51,7 +53,66 @@ internal class CCommandLine : ICommandLine
                 }
             }
         }
+
+        ApplyStartupConfig();
     }
+
+    private void ApplyStartupConfig()
+    {
+        var convars = InterfaceSystem.GetInterface<IConVarSystem>(InterfaceNames.ConVar);
+        var terminal = InterfaceSystem.GetInterface<ITerminal>(InterfaceNames.Terminal);
+
+        for (int i = 0; i < _parameters.Count; i++)
+        {
+            var token = _parameters[i];
+            if (token.Length < 2 || (token[0] != '+' && token[0] != '-'))
+            {
+                continue;
+            }
+
+            bool force = token[0] == '-';
+            string name = token[1..];
+
+            var parts = new List<string>();
+            int j = i + 1;
+            while (j < _parameters.Count && !IsDirective(_parameters[j]))
+            {
+                parts.Add(_parameters[j]);
+                j++;
+            }
+            i = j - 1;
+
+            string? value = parts.Count > 0 ? string.Join(' ', parts) : null;
+
+            var convar = convars?.Find(name);
+            if (convar != null)
+            {
+                if (!force && convar.Flags.HasFlag(ConVarFlags.ReadOnly))
+                {
+                    continue;
+                }
+
+                if (value == null)
+                {
+                    if (convar.ValueType != typeof(bool))
+                    {
+                        continue;
+                    }
+                    value = "1";
+                }
+
+                convar.SetFromString(value, force);
+            }
+            else if (!force)
+            {
+                var line = value == null ? name : $"{name} {value}";
+                terminal?.Execute(line);
+            }
+        }
+    }
+
+    private static bool IsDirective(string token)
+        => token.Length >= 2 && (token[0] == '+' || token[0] == '-');
 
     public void Initialize(string[] args)
     {
