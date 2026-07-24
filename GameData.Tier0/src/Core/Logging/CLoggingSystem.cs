@@ -21,6 +21,7 @@ internal sealed class CLoggingSystem : ILoggingSystem
     private readonly Lock _lock = new();
     private readonly List<Channel> _channels = [];
     private readonly List<ILoggingListener> _listeners = [];
+    private readonly List<CLoggingTask> _tasks = [];
     private ILoggingResponsePolicy _policy = new CDefaultLoggingResponsePolicy();
 
     public int RegisterChannel(string name, LoggingChannelFlags flags = LoggingChannelFlags.None,
@@ -256,6 +257,47 @@ internal sealed class CLoggingSystem : ILoggingSystem
         lock (_lock)
         {
             _policy = policy ?? new CDefaultLoggingResponsePolicy();
+        }
+    }
+
+    public ILoggingTask BeginSpinner(int channelId, string label)
+        => AddTask(channelId, label, null);
+
+    public ILoggingTask BeginProgress(int channelId, string label)
+        => AddTask(channelId, label, 0.0);
+
+    public IReadOnlyList<ILoggingTask> ActiveTasks
+    {
+        get
+        {
+            lock (_lock)
+            {
+                return [.. _tasks];
+            }
+        }
+    }
+
+    private ILoggingTask AddTask(int channelId, string label, double? progress)
+    {
+        var task = new CLoggingTask(this, channelId, label, progress);
+        lock (_lock)
+        {
+            _tasks.Add(task);
+        }
+        return task;
+    }
+
+    internal void EndTask(CLoggingTask task, bool ok, string? message)
+    {
+        lock (_lock)
+        {
+            _tasks.Remove(task);
+        }
+
+        if (message != null)
+        {
+            string glyph = ok ? "✓" : "✗";
+            Log(task.ChannelId, ok ? LoggingSeverity.Message : LoggingSeverity.Warning, $"{glyph} {message}");
         }
     }
 

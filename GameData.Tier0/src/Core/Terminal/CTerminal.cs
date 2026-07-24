@@ -15,6 +15,11 @@ internal sealed class CTerminal : ITerminal, ICommandSink
     private const string Csi = "\x1b[";
     private const int MaxScrollback = 2000;
     private const int MaxSuggestions = 8;
+    private const int MaxTasks = 6;
+    private const int TickMs = 90;
+
+    private static readonly string[] SpinnerFrames =
+        ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
 
     private readonly Lock _lock = new();
     private readonly Lock _render = new();
@@ -32,6 +37,10 @@ internal sealed class CTerminal : ITerminal, ICommandSink
     private int _historyIndex;
     private int _cursorRow = 1;
     private int _cursorCol = 1;
+    private int _spinnerPhase;
+    private bool _hadTasks;
+    private bool _live;
+    private System.Threading.Timer? _tickTimer;
 
     private ILoggingSystem? _log;
     private IConVarSystem? _convars;
@@ -181,6 +190,7 @@ internal sealed class CTerminal : ITerminal, ICommandSink
         // Alternate screen buffer, autowrap off (so long lines don't break the layout).
         System.Console.Write($"{Csi}?1049h{Csi}?7l");
         TerminalOutput.Writer = WriteLine;
+        _live = true;
 
         try
         {
@@ -188,6 +198,8 @@ internal sealed class CTerminal : ITerminal, ICommandSink
             {
                 Render();
             }
+
+            _tickTimer = new System.Threading.Timer(_ => OnTick(), null, TickMs, TickMs);
 
             while (_running)
             {
@@ -317,9 +329,32 @@ internal sealed class CTerminal : ITerminal, ICommandSink
         }
         finally
         {
+            _tickTimer?.Dispose();
+            _tickTimer = null;
+            _live = false;
             TerminalOutput.Writer = null;
             System.Console.Write($"{Csi}?7h{Csi}?25h{Csi}?1049l");
             System.Console.OutputEncoding = previousEncoding;
+        }
+    }
+
+    private void OnTick()
+    {
+        lock (_render)
+        {
+            if (!_running)
+            {
+                return;
+            }
+
+            int count = Log()?.ActiveTasks.Count ?? 0;
+            if (count == 0 && !_hadTasks)
+            {
+                return;
+            }
+
+            _spinnerPhase++;
+            Render();
         }
     }
 
@@ -349,13 +384,22 @@ internal sealed class CTerminal : ITerminal, ICommandSink
         int height = System.Console.WindowHeight;
         int width = System.Console.WindowWidth;
 
+        IReadOnlyList<ILoggingTask> tasks = _live && Log() is { } log ? log.ActiveTasks : [];
+        _hadTasks = tasks.Count > 0;
+
+        int taskRows = Math.Min(tasks.Count, MaxTasks);
+        taskRows = Math.Min(taskRows, Math.Max(0, height - 6));
+
         int popupHeight = Math.Min(_suggestions.Count, MaxSuggestions);
-        popupHeight = Math.Min(popupHeight, Math.Max(0, height - 5));
+        popupHeight = Math.Min(popupHeight, Math.Max(0, height - 5 - taskRows));
+
+        int logRows = Math.Max(0, height - 4 - popupHeight - taskRows);
 
         _frame.Clear();
         _frame.Append($"{Csi}?25l");
 
-        BuildLog(height, popupHeight);
+        BuildLog(logRows);
+        BuildTasks(logRows + 1, taskRows, width, tasks);
         BuildSuggestions(height, width, popupHeight);
         BuildInputBox(height, width);
         BuildHint(height, width);
@@ -365,9 +409,8 @@ internal sealed class CTerminal : ITerminal, ICommandSink
         System.Console.Out.Write(_frame);
     }
 
-    private void BuildLog(int height, int popupHeight)
+    private void BuildLog(int logRows)
     {
-        int logRows = Math.Max(0, height - 4 - popupHeight);
         int start = Math.Max(0, _lines.Count - logRows);
 
         for (int row = 0; row < logRows; row++)
@@ -380,6 +423,59 @@ internal sealed class CTerminal : ITerminal, ICommandSink
                 _frame.Append(_lines[index]);
             }
         }
+    }
+
+    private void BuildTasks(int firstRow, int taskRows, int width, IReadOnlyList<ILoggingTask> tasks)
+    {
+        if (taskRows <= 0)
+        {
+            return;
+        }
+
+        string spin = SpinnerFrames[_spinnerPhase % SpinnerFrames.Length];
+
+        for (int i = 0; i < taskRows; i++)
+        {
+            int row = firstRow + i;
+            _frame.Append($"{Csi}{row};1H{Csi}2K");
+            _frame.Append(FormatTask(tasks[i], spin, width));
+        }
+    }
+
+    private static string FormatTask(ILoggingTask task, string spin, int width)
+    {
+        const string cyan = "38;5;51";
+        const string filledColor = "38;5;42";
+        const string emptyColor = "38;5;238";
+
+        if (task.Progress is double p)
+        {
+            string pct = $"{(int)Math.Round(p * 100),3}%";
+            int barWidth = 22;
+            int overhead = 1 + 1 + 2 + barWidth + 1 + pct.Length;
+            string label = Clip(task.Label, Math.Max(0, width - overhead));
+
+            int filled = Math.Clamp((int)Math.Round(p * barWidth), 0, barWidth);
+            string bar = $"{Csi}{filledColor}m{new string('█', filled)}{Csi}{emptyColor}m{new string('░', barWidth - filled)}{Csi}0m";
+
+            return $"{Csi}{cyan}m{spin}{Csi}0m {label}  {bar} {pct}";
+        }
+
+        string spinnerLabel = Clip(task.Label, Math.Max(0, width - 2));
+        return $"{Csi}{cyan}m{spin}{Csi}0m {spinnerLabel}";
+    }
+
+    private static string Clip(string text, int max)
+    {
+        if (max <= 0)
+        {
+            return "";
+        }
+        if (text.Length <= max)
+        {
+            return text;
+        }
+        return max > 1 ? text[..(max - 1)] + "…" : text[..1];
     }
 
     private void BuildSuggestions(int height, int width, int popupHeight)

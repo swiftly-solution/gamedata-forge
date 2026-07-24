@@ -50,6 +50,12 @@ public interface ILoggingSystem
 
     void SetResponsePolicy(ILoggingResponsePolicy? policy);
 
+    ILoggingTask BeginSpinner(int channelId, string label);
+
+    ILoggingTask BeginProgress(int channelId, string label);
+
+    IReadOnlyList<ILoggingTask> ActiveTasks { get; }
+
     LoggingResponse Log(int channelId, LoggingSeverity severity, string message,
         [CallerFilePath] string? file = null,
         [CallerLineNumber] int line = 0,
