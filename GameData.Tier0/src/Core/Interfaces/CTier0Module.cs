@@ -1,3 +1,4 @@
+using GameData.Tier0.Shared.ConVar;
 using GameData.Tier0.Shared.Drawing;
 using GameData.Tier0.Shared.Interfaces;
 using GameData.Tier0.Shared.Logging;
@@ -8,6 +9,8 @@ internal sealed class CTier0Module : IModule
 {
     public void Init(IInterfaceSystem system)
     {
+        system.GetInterface<IConVarSystem>(InterfaceNames.ConVar);
+
         var logging = system.GetInterface<ILoggingSystem>(InterfaceNames.LoggingSystem);
         if (logging == null)
         {

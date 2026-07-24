@@ -1,0 +1,141 @@
+using GameData.Tier0.Shared.Interfaces;
+using GameData.Tier0.Shared.String;
+
+namespace GameData.Tier0.Shared.ConVar;
+
+public sealed class ConVar<T> : IConVar
+{
+    private T _value;
+
+    public string Name { get; }
+    public string? Description { get; }
+    public ConVarFlags Flags { get; }
+    public bool HasBounds { get; }
+    public T Min { get; } = default!;
+    public T Max { get; } = default!;
+
+    public Type ValueType => typeof(T);
+
+    public event Action<ConVar<T>, T, T>? OnChanged;
+
+    public ConVar(string name, T defaultValue, string? description = null,
+        ConVarFlags flags = ConVarFlags.None, (T Min, T Max)? bounds = null)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("ConVar name must not be empty.", nameof(name));
+        }
+
+        if (!ConVarTypes.IsSupported(typeof(T)))
+        {
+            throw new NotSupportedException($"ConVar type '{typeof(T)}' is not supported.");
+        }
+
+        if (bounds.HasValue && !ConVarTypes.IsNumeric(typeof(T)))
+        {
+            throw new ArgumentException($"Bounds are only valid for numeric ConVar types, not '{typeof(T)}'.", nameof(bounds));
+        }
+
+        Name = name;
+        Description = description;
+        Flags = flags;
+
+        if (bounds.HasValue)
+        {
+            HasBounds = true;
+            Min = bounds.Value.Min;
+            Max = bounds.Value.Max;
+        }
+
+        _value = Clamp(defaultValue);
+
+        ConVarRegistry.Register(this);
+    }
+
+    public T Value
+    {
+        get => _value;
+        set
+        {
+            if (Flags.HasFlag(ConVarFlags.ReadOnly))
+            {
+                throw new InvalidOperationException($"ConVar '{Name}' is read-only and cannot be changed.");
+            }
+
+            T clamped = Clamp(value);
+            if (EqualityComparer<T>.Default.Equals(_value, clamped))
+            {
+                return;
+            }
+
+            T old = _value;
+            _value = clamped;
+
+            OnChanged?.Invoke(this, old, clamped);
+            ConVarRegistry.NotifyChanged(this);
+        }
+    }
+
+    public string ToStringValue() => _value?.ToString() ?? "";
+
+    public void SetFromString(string value)
+    {
+        if (typeof(T) == typeof(string))
+        {
+            Value = (T)(object)value;
+            return;
+        }
+
+        Value = Parse(value);
+    }
+
+    private T Parse(string s)
+    {
+        var strConv = InterfaceSystem.GetInterface<IStrConv>(InterfaceNames.StrConv);
+        if (strConv == null)
+        {
+            return _value;
+        }
+
+        object current = _value!;
+
+        object result = typeof(T) switch
+        {
+            var t when t == typeof(byte) => strConv.Convert(s, (byte)current),
+            var t when t == typeof(sbyte) => strConv.Convert(s, (sbyte)current),
+            var t when t == typeof(short) => strConv.Convert(s, (short)current),
+            var t when t == typeof(ushort) => strConv.Convert(s, (ushort)current),
+            var t when t == typeof(int) => strConv.Convert(s, (int)current),
+            var t when t == typeof(uint) => strConv.Convert(s, (uint)current),
+            var t when t == typeof(long) => strConv.Convert(s, (long)current),
+            var t when t == typeof(ulong) => strConv.Convert(s, (ulong)current),
+            var t when t == typeof(float) => strConv.Convert(s, (float)current),
+            var t when t == typeof(double) => strConv.Convert(s, (double)current),
+            var t when t == typeof(bool) => strConv.Convert(s, (bool)current),
+            _ => current,
+        };
+
+        return (T)result;
+    }
+
+    private T Clamp(T value)
+    {
+        if (!HasBounds)
+        {
+            return value;
+        }
+
+        var comparer = Comparer<T>.Default;
+        if (comparer.Compare(value, Min) < 0)
+        {
+            return Min;
+        }
+
+        if (comparer.Compare(value, Max) > 0)
+        {
+            return Max;
+        }
+
+        return value;
+    }
+}
