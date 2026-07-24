@@ -98,9 +98,10 @@ public sealed class ConVar<T> : IConVar
 
         if (typeof(T).IsEnum)
         {
+            bool isFlags = Attribute.IsDefined(typeof(T), typeof(FlagsAttribute));
             if (Enum.TryParse(typeof(T), value, ignoreCase: true, out var parsed)
                 && parsed != null
-                && Enum.IsDefined(typeof(T), parsed))
+                && (isFlags || Enum.IsDefined(typeof(T), parsed)))
             {
                 SetValue((T)parsed, force);
             }
