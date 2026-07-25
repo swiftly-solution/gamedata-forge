@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>GameData.DepotDownloader</AssemblyName>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <BaseOutputPath>..\build\</BaseOutputPath>
+    <OutputPath>$(BaseOutputPath)Release\GameData.DepotDownloader</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GameData.Tier0\GameData.Tier0.csproj" />
+  </ItemGroup>
+
+  <!--
+    DepotDownloader ships as an application assembly with every type marked internal,
+    so it cannot be bound against at compile time; CDepotDownloader drives it through
+    reflection instead. Shipped as Content rather than Reference so the assemblies also
+    flow to the output of whatever hosts this module.
+  -->
+  <ItemGroup>
+    <Content Include="DepotDownloader\*.dll" Link="%(Filename)%(Extension)">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

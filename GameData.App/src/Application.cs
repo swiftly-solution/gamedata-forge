@@ -7,6 +7,7 @@ public class Application
     public static void Main(string[] args)
     {
         InterfaceSystem.LoadModule("GameData.Tier0");
+        InterfaceSystem.LoadModule("GameData.DepotDownloader");
 
         var cmd = InterfaceSystem.GetInterface<ICommandLine>(InterfaceNames.CommandLine)!;
         var terminal = InterfaceSystem.GetInterface<ITerminal>(InterfaceNames.Terminal)!;

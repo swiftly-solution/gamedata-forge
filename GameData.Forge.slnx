@@ -1,5 +1,6 @@
 <Solution>
     <Project Path="GameData.Tier0/GameData.Tier0.csproj" />
+    <Project Path="GameData.DepotDownloader/GameData.DepotDownloader.csproj" />
     <Project Path="GameData.App/GameData.App.csproj" />
     <Project Path="GameData.Forge.csproj" />
 </Solution>

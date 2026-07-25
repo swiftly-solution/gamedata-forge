@@ -31,6 +31,9 @@ internal sealed class CTerminal : ITerminal, ICommandSink
     private readonly StringBuilder _ansiBuffer = new();
     private readonly StringBuilder _frame = new();
     private readonly IAnsiConsole _ansi;
+
+    private readonly TextWriter _stdout = Console.Out;
+
     private bool _running;
     private string _input = string.Empty;
     private int _caret;
@@ -42,7 +45,7 @@ internal sealed class CTerminal : ITerminal, ICommandSink
     private int _spinnerPhase;
     private bool _hadTasks;
     private bool _live;
-    private System.Threading.Timer? _tickTimer;
+    private Timer? _tickTimer;
 
     private ILoggingSystem? _log;
     private IConVarSystem? _convars;
@@ -452,7 +455,7 @@ internal sealed class CTerminal : ITerminal, ICommandSink
 
         _frame.Append($"{Csi}{_cursorRow};{_cursorCol}H{Csi}?25h");
 
-        System.Console.Out.Write(_frame);
+        _stdout.Write(_frame);
     }
 
     private void BuildLog(int logRows)
