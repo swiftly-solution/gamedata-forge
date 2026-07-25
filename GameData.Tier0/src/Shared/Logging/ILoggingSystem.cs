@@ -50,9 +50,15 @@ public interface ILoggingSystem
 
     void SetResponsePolicy(ILoggingResponsePolicy? policy);
 
-    ILoggingTask BeginSpinner(int channelId, string label);
+    ILoggingTask BeginSpinner(int channelId, string label,
+        [CallerFilePath] string? file = null,
+        [CallerLineNumber] int line = 0,
+        [CallerMemberName] string? function = null);
 
-    ILoggingTask BeginProgress(int channelId, string label);
+    ILoggingTask BeginProgress(int channelId, string label,
+        [CallerFilePath] string? file = null,
+        [CallerLineNumber] int line = 0,
+        [CallerMemberName] string? function = null);
 
     IReadOnlyList<ILoggingTask> ActiveTasks { get; }
 

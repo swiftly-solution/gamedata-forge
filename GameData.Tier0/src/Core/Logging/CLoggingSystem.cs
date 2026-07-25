@@ -260,11 +260,13 @@ internal sealed class CLoggingSystem : ILoggingSystem
         }
     }
 
-    public ILoggingTask BeginSpinner(int channelId, string label)
-        => AddTask(channelId, label, null);
+    public ILoggingTask BeginSpinner(int channelId, string label,
+        string? file = null, int line = 0, string? function = null)
+        => AddTask(channelId, label, null, new LeafCodeInfo(file, line, function));
 
-    public ILoggingTask BeginProgress(int channelId, string label)
-        => AddTask(channelId, label, 0.0);
+    public ILoggingTask BeginProgress(int channelId, string label,
+        string? file = null, int line = 0, string? function = null)
+        => AddTask(channelId, label, 0.0, new LeafCodeInfo(file, line, function));
 
     public IReadOnlyList<ILoggingTask> ActiveTasks
     {
@@ -277,9 +279,9 @@ internal sealed class CLoggingSystem : ILoggingSystem
         }
     }
 
-    private ILoggingTask AddTask(int channelId, string label, double? progress)
+    private ILoggingTask AddTask(int channelId, string label, double? progress, LeafCodeInfo source)
     {
-        var task = new CLoggingTask(this, channelId, label, progress);
+        var task = new CLoggingTask(this, channelId, label, progress, source);
         lock (_lock)
         {
             _tasks.Add(task);
@@ -297,7 +299,8 @@ internal sealed class CLoggingSystem : ILoggingSystem
         if (message != null)
         {
             string glyph = ok ? "✓" : "✗";
-            Log(task.ChannelId, ok ? LoggingSeverity.Message : LoggingSeverity.Warning, $"{glyph} {message}");
+            Log(task.ChannelId, ok ? LoggingSeverity.Message : LoggingSeverity.Warning, $"{glyph} {message}",
+                task.Source.File, task.Source.Line, task.Source.Function);
         }
     }
 

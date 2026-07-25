@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Text;
 using GameData.Tier0.Shared.ConVar;
 using GameData.Tier0.Shared.Interfaces;
@@ -619,9 +620,17 @@ internal sealed class CTerminal : ITerminal, ICommandSink
         _frame.Append($"{Csi}{height};1H{Csi}2K{Csi}90m{text}{Csi}0m");
     }
 
-    private void Print(string message) => Log()?.Msg(Channel(), message);
+    private void Print(string message,
+        [CallerFilePath] string? file = null,
+        [CallerLineNumber] int line = 0,
+        [CallerMemberName] string? function = null)
+        => Log()?.Msg(Channel(), message, file, line, function);
 
-    private void Warn(string message) => Log()?.Warning(Channel(), message);
+    private void Warn(string message,
+        [CallerFilePath] string? file = null,
+        [CallerLineNumber] int line = 0,
+        [CallerMemberName] string? function = null)
+        => Log()?.Warning(Channel(), message, file, line, function);
 
     private ILoggingSystem? Log()
         => _log ??= InterfaceSystem.GetInterface<ILoggingSystem>(InterfaceNames.LoggingSystem);

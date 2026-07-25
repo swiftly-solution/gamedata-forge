@@ -8,15 +8,18 @@ internal sealed class CLoggingTask : ILoggingTask
     private double? _progress;
     private bool _running = true;
 
-    public CLoggingTask(CLoggingSystem owner, int channelId, string label, double? progress)
+    public CLoggingTask(CLoggingSystem owner, int channelId, string label, double? progress, LeafCodeInfo source)
     {
         _owner = owner;
         ChannelId = channelId;
         Label = label;
         _progress = progress;
+        Source = source;
     }
 
     public int ChannelId { get; }
+
+    internal LeafCodeInfo Source { get; }
 
     public string Label { get; set; }
 
