@@ -1,8 +1,10 @@
 using System.Diagnostics;
+using GameData.IDA.Core.Analysis;
 using GameData.IDA.Core.Native;
 using GameData.IDA.Shared.Ida;
 using GameData.IDA.Shared.Interfaces;
 using GameData.Tier0.Shared.Interfaces;
+using GameData.Tier0.Shared.Logging;
 
 namespace GameData.IDA.Core.Kernel;
 
@@ -81,10 +83,45 @@ internal sealed unsafe class CIdaLibrary : IIdaLibrary
 
         if (runAutoAnalysis)
         {
+            PatchPlt();
             Ida.build_strlist();
         }
 
         return 0;
+    }
+
+    private static void PatchPlt()
+    {
+        if (!CIdaConVars.PltPatch)
+        {
+            return;
+        }
+
+        var result = CPltPatcher.Run();
+        if (!result.Applicable)
+        {
+            return;
+        }
+
+        var logging = InterfaceSystem.GetInterface<ILoggingSystem>(InterfaceNames.LoggingSystem);
+        int channel = logging?.FindChannel("IDA") ?? -1;
+
+        if (logging == null || channel < 0)
+        {
+            return;
+        }
+
+        string created = result.Created > 0 ? $", {result.Created} stub(s) created" : string.Empty;
+        string message = $"Patched {result.Patched} PLT entr{(result.Patched == 1 ? "y" : "ies")}{created}.";
+
+        if (result.Unresolved > 0)
+        {
+            logging.Warning(channel, $"{message} {result.Unresolved} could not be resolved.");
+        }
+        else
+        {
+            logging.Msg(channel, message);
+        }
     }
 
     private static void RunAnalysis(Action<IdaAnalysisProgress> onProgress)

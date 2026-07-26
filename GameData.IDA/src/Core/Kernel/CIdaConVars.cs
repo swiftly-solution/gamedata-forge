@@ -9,6 +9,7 @@ internal static class CIdaConVars
     private static ConVar<IdaSdkVersion>? _idaSdk;
     private static ConVar<int>? _cores;
     private static ConVar<bool>? _idaWorker;
+    private static ConVar<bool>? _pltPatch;
 
     internal static string IdaPath => _idaPath?.Value ?? string.Empty;
 
@@ -17,6 +18,8 @@ internal static class CIdaConVars
     internal static int Cores => _cores?.Value ?? 1;
 
     internal static bool IsWorker => _idaWorker?.Value ?? false;
+
+    internal static bool PltPatch => _pltPatch?.Value ?? true;
 
     internal static void Register()
     {
@@ -50,5 +53,12 @@ internal static class CIdaConVars
             "Set by the pool on the processes it spawns; there is no reason to set it by hand " +
             "except to test the worker protocol. Read-only: set it at startup with -ida_worker 1.",
             ConVarFlags.ReadOnly);
+
+        _pltPatch ??= new ConVar<bool>(
+            "ida_plt_patch",
+            true,
+            "Repair PLT stubs after analyzing an ELF64, for the binaries IDA gives up on with " +
+            "'Could not patch the PLT stub' — mold-linked ones, mostly. Without it, calls to " +
+            "imported functions have no cross-references. Non-ELF64 inputs ignore this.");
     }
 }

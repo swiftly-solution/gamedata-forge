@@ -42,6 +42,58 @@ public static class IdaConstants
         public const int NonPublic = 0x04;
         public const int Auto = 0x20;
         public const int NonAuto = 0x40;
+        public const int NoWarn = 0x100;
+
+        /// <summary>Rename whatever already holds the name rather than refusing.</summary>
+        public const int Force = 0x800;
+    }
+
+    /// <summary>Function flags — FUNC_, funcs.hpp. These live in <c>func_t::flags</c>.</summary>
+    public static class FuncFlags
+    {
+        public const ulong NoRet = 0x00000001;
+        public const ulong Lib = 0x00000004;
+
+        /// <summary>A jump function: the body is one jump to the real implementation.</summary>
+        public const ulong Thunk = 0x00000080;
+
+        /// <summary>
+        /// Set by <c>func_t</c>'s constructor: the non-return analysis has not run yet.
+        /// </summary>
+        public const ulong NoRetPending = 0x00000200;
+
+        public const ulong Tail = 0x00008000;
+    }
+
+    /// <summary>Code cross-reference types — <c>cref_t</c>, xref.hpp.</summary>
+    public static class Cref
+    {
+        public const int CallFar = 16;
+        public const int CallNear = 17;
+        public const int JumpFar = 18;
+        public const int JumpNear = 19;
+        public const int Flow = 21;
+    }
+
+    /// <summary>Data cross-reference types — <c>dref_t</c>, xref.hpp.</summary>
+    public static class Dref
+    {
+        /// <summary>The reference uses the address of the data rather than its value.</summary>
+        public const int Offset = 1;
+
+        public const int Write = 2;
+        public const int Read = 3;
+    }
+
+    /// <summary>Flags for <c>set_segm_start</c> / <c>set_segm_end</c> — SEGMOD_, segment.hpp.</summary>
+    public static class SegMod
+    {
+        public const int Kill = 0x0001;
+
+        /// <summary>Keep the code and data already defined in the affected range.</summary>
+        public const int Keep = 0x0002;
+
+        public const int Silent = 0x0004;
     }
 
     /// <summary>Flags for <c>bin_search</c> — BIN_SEARCH_, bytes.hpp.</summary>
