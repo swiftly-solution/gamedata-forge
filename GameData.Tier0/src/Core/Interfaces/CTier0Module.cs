@@ -13,6 +13,7 @@ internal sealed class CTier0Module : IModule
         system.GetInterface<IConVarSystem>(InterfaceNames.ConVar);
         system.GetInterface<ITerminal>(InterfaceNames.Terminal);
         Terminal.CTerminalCommands.Register();
+        Terminal.CTerminalConVars.Register();
 
         _ = new ConVar<bool>("noassert", false,
             "Suppresses the debugger break on assertion failures. Set with -noassert at startup.",

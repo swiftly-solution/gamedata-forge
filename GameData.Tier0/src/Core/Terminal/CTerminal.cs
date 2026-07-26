@@ -16,7 +16,6 @@ internal sealed class CTerminal : ITerminal, ICommandSink
     private const string Csi = "\x1b[";
     private const int MaxScrollback = 2000;
     private const int MaxSuggestions = 8;
-    private const int MaxTasks = 6;
     private const int TickMs = 90;
 
     private static readonly string[] SpinnerFrames =
@@ -436,7 +435,7 @@ internal sealed class CTerminal : ITerminal, ICommandSink
         IReadOnlyList<ILoggingTask> tasks = _live && Log() is { } log ? log.ActiveTasks : [];
         _hadTasks = tasks.Count > 0;
 
-        int taskRows = Math.Min(tasks.Count, MaxTasks);
+        int taskRows = Math.Min(tasks.Count, CTerminalConVars.MaxTasks);
         taskRows = Math.Min(taskRows, Math.Max(0, height - 6));
 
         int popupHeight = Math.Min(_suggestions.Count, MaxSuggestions);

@@ -1,0 +1,140 @@
+GameData.IDA.Codegen report
+  generated : 2026-07-26 08:07:44 UTC
+  sdk root  : C:\Users\SkuZZi\Desktop\gamedata-autogen\thirdparty\ida-sdk
+  versions  : 9.2.0-sdk.1, 9.3.0-sdk.3
+
+  surface functions     : 1426
+  surface data exports  : 5
+  version-guarded       : 27
+  signature conflicts   : 9
+  opaque types emitted  : 167
+
+IDA 9.2 (9.2.0-sdk.1)
+  exports    : 1851 symbols across the committed dumps
+  declarations scanned : 1420
+  rendered             : 1413
+  bound by this version: 1404
+  skipped              : 7
+  malformed            : 19
+  unresolved base types: 3
+      merge_node_hlpfunc_creator_t
+      qstring
+      uint128
+
+IDA 9.3 (9.3.0-sdk.3)
+  exports    : 1904 symbols across the committed dumps
+  declarations scanned : 1448
+  rendered             : 1440
+  bound by this version: 1431
+  skipped              : 8
+  malformed            : 19
+  unresolved base types: 4
+      builtin_widgets_mask_t
+      merge_node_hlpfunc_creator_t
+      qstring
+      uint128
+
+Symbols whose rendered signature differs between SDK versions. These are left off
+the surface entirely: binding one shape and calling it on the other version would
+corrupt the stack silently. Each needs a hand-written per-version shim.
+
+  dirtree_change_rank
+      9.2    delegate* unmanaged[Cdecl]<dirtree_impl_t*, byte*, nint, int>
+      9.3    delegate* unmanaged[Cdecl]<dirtree_impl_t*, byte*, nint, byte>
+  dirtree_chdir
+      9.2    delegate* unmanaged[Cdecl]<dirtree_impl_t*, byte*, int>
+      9.3    delegate* unmanaged[Cdecl]<dirtree_impl_t*, byte*, byte>
+  dirtree_errstr
+      9.2    delegate* unmanaged[Cdecl]<int, byte*>
+      9.3    delegate* unmanaged[Cdecl]<byte, byte*>
+  dirtree_find_entry
+      9.2    delegate* unmanaged[Cdecl]<dirtree_cursor_t*, dirtree_t*, direntry_t*, int>
+      9.3    delegate* unmanaged[Cdecl]<dirtree_cursor_t*, dirtree_t*, direntry_t*, byte>
+  dirtree_link
+      9.2    delegate* unmanaged[Cdecl]<dirtree_impl_t*, byte*, byte, int>
+      9.3    delegate* unmanaged[Cdecl]<dirtree_impl_t*, byte*, byte, byte>
+  dirtree_link_inode
+      9.2    delegate* unmanaged[Cdecl]<dirtree_impl_t*, ulong, byte, int>
+      9.3    delegate* unmanaged[Cdecl]<dirtree_impl_t*, ulong, byte, byte>
+  dirtree_mkdir
+      9.2    delegate* unmanaged[Cdecl]<dirtree_impl_t*, byte*, int>
+      9.3    delegate* unmanaged[Cdecl]<dirtree_impl_t*, byte*, byte>
+  dirtree_rename
+      9.2    delegate* unmanaged[Cdecl]<dirtree_impl_t*, byte*, byte*, int>
+      9.3    delegate* unmanaged[Cdecl]<dirtree_impl_t*, byte*, byte*, byte>
+  dirtree_rmdir
+      9.2    delegate* unmanaged[Cdecl]<dirtree_impl_t*, byte*, int>
+      9.3    delegate* unmanaged[Cdecl]<dirtree_impl_t*, byte*, byte>
+
+IDA 9.2 — declarations the scanner rejected (19):
+  cvt64.hpp: va_list :: idaman int ida_export cvt64_node_supval_for_event( va_list va, const cvt64_node_tag_t *node_info, size_t node_info_qty);
+  err.h: va_list :: idaman THREAD_SAFE AS_PRINTF(1, 0) void ida_export vqperror(const char *format, va_list va);
+  fpro.h: va_list :: idaman THREAD_SAFE AS_PRINTF(2, 0) int ida_export qvfprintf(FILE *fp, const char *format, va_list va);
+  fpro.h: va_list :: idaman THREAD_SAFE AS_PRINTF(1, 0) int ida_export qvprintf(const char *format, va_list va);
+  fpro.h: va_list :: idaman THREAD_SAFE AS_PRINTF(1, 0) int ida_export qveprintf(const char *format, va_list va);
+  fpro.h: va_list :: idaman THREAD_SAFE AS_SCANF(2, 0) int ida_export qvfscanf(FILE *fp, const char *format, va_list va);
+  ida.hpp: va_list :: idaman ssize_t ida_export invoke_callbacks(hook_type_t hook_type, int notification_code, va_list va);
+  kernwin.hpp: va_list :: idaman NORETURN AS_PRINTF(1, 0) void ida_export verror(const char *format, va_list va);
+  kernwin.hpp: va_list :: idaman AS_PRINTF(3, 0) void ida_export vshow_hex( const void *dataptr, size_t len, const char *format, va_list va);
+  kernwin.hpp: va_list :: idaman AS_PRINTF(4, 0) void ida_export vshow_hex_file( linput_t *li, int64 pos, size_t count, const char *format, va_list va);
+  lines.hpp: va_list :: idaman AS_PRINTF(3, 0) bool ida_export vadd_extra_line( ea_t ea, int vel_flags, const char *format, va_list va);
+  loader.hpp: va_list :: idaman AS_PRINTF(1, 0) NORETURN void ida_export vloader_failure(const char *format, va_list va);
+  pro.h: variadic :: idaman AS_PRINTF(3, 4) THREAD_SAFE int ida_export qsnprintf(char *buffer, size_t n, const char *format, ...);
+  pro.h: variadic :: idaman AS_SCANF (2, 3) THREAD_SAFE int ida_export qsscanf(const char *input, const char *format, ...);
+  pro.h: va_list :: idaman AS_PRINTF(3, 0) THREAD_SAFE int ida_export qvsnprintf(char *buffer, size_t n, const char *format, va_list va);
+  pro.h: va_list :: idaman AS_SCANF (2, 0) THREAD_SAFE int ida_export qvsscanf(const char *input, const char *format, va_list va);
+  pro.h: variadic :: idaman AS_PRINTF(3, 4) THREAD_SAFE int ida_export append_snprintf(char *buf, const char *end, const char *format, ...);
+  pro.h: va_list :: idaman THREAD_SAFE char *ida_export vqmakepath(char *buf, size_t bufsize, const char *s1, va_list);
+  pro.h: variadic :: idaman THREAD_SAFE char *ida_export qmakepath(char *buf, size_t bufsize, const char *s1, ...);
+
+IDA 9.2 — skipped declarations, grouped by reason:
+  [3] duplicate declaration
+      pro.h                  launch_process
+      pro.h                  qstr2user
+      pro.h                  user2qstr
+  [1] unmappable parameter type 'uint128'
+      kernwin.hpp            btoa128
+  [1] unmappable parameter type 'merge_node_hlpfunc_creator_t'
+      merge.hpp              create_nodeval_merge_handler
+  [1] unmappable parameter type 'qstring'
+      moves.hpp              bookmarks_t_set_desc
+  [1] declared but not exported
+      pro.h                  memicmp
+
+IDA 9.3 — declarations the scanner rejected (19):
+  cvt64.hpp: va_list :: idaman int ida_export cvt64_node_supval_for_event( va_list va, const cvt64_node_tag_t *node_info, size_t node_info_qty);
+  err.h: va_list :: idaman THREAD_SAFE AS_PRINTF(1, 0) void ida_export vqperror(const char *format, va_list va);
+  fpro.h: va_list :: idaman THREAD_SAFE AS_PRINTF(2, 0) int ida_export qvfprintf(FILE *fp, const char *format, va_list va);
+  fpro.h: va_list :: idaman THREAD_SAFE AS_PRINTF(1, 0) int ida_export qvprintf(const char *format, va_list va);
+  fpro.h: va_list :: idaman THREAD_SAFE AS_PRINTF(1, 0) int ida_export qveprintf(const char *format, va_list va);
+  fpro.h: va_list :: idaman THREAD_SAFE AS_SCANF(2, 0) int ida_export qvfscanf(FILE *fp, const char *format, va_list va);
+  ida.hpp: va_list :: idaman ssize_t ida_export invoke_callbacks(hook_type_t hook_type, int notification_code, va_list va);
+  kernwin.hpp: va_list :: idaman NORETURN AS_PRINTF(1, 0) void ida_export verror(const char *format, va_list va);
+  kernwin.hpp: va_list :: idaman AS_PRINTF(3, 0) void ida_export vshow_hex( const void *dataptr, size_t len, const char *format, va_list va);
+  kernwin.hpp: va_list :: idaman AS_PRINTF(4, 0) void ida_export vshow_hex_file( linput_t *li, int64 pos, size_t count, const char *format, va_list va);
+  lines.hpp: va_list :: idaman AS_PRINTF(3, 0) bool ida_export vadd_extra_line( ea_t ea, int vel_flags, const char *format, va_list va);
+  loader.hpp: va_list :: idaman AS_PRINTF(1, 0) NORETURN void ida_export vloader_failure(const char *format, va_list va);
+  pro.h: variadic :: idaman AS_PRINTF(3, 4) THREAD_SAFE int ida_export qsnprintf(char *buffer, size_t n, const char *format, ...);
+  pro.h: variadic :: idaman AS_SCANF (2, 3) THREAD_SAFE int ida_export qsscanf(const char *input, const char *format, ...);
+  pro.h: va_list :: idaman AS_PRINTF(3, 0) THREAD_SAFE int ida_export qvsnprintf(char *buffer, size_t n, const char *format, va_list va);
+  pro.h: va_list :: idaman AS_SCANF (2, 0) THREAD_SAFE int ida_export qvsscanf(const char *input, const char *format, va_list va);
+  pro.h: variadic :: idaman AS_PRINTF(3, 4) THREAD_SAFE int ida_export append_snprintf(char *buf, const char *end, const char *format, ...);
+  pro.h: va_list :: idaman THREAD_SAFE char *ida_export vqmakepath(char *buf, size_t bufsize, const char *s1, va_list);
+  pro.h: variadic :: idaman THREAD_SAFE char *ida_export qmakepath(char *buf, size_t bufsize, const char *s1, ...);
+
+IDA 9.3 — skipped declarations, grouped by reason:
+  [3] duplicate declaration
+      pro.h                  launch_process
+      pro.h                  qstr2user
+      pro.h                  user2qstr
+  [1] unmappable parameter type 'builtin_widgets_mask_t'
+      kernwin.hpp            mark_builtin_widgets
+  [1] unmappable parameter type 'uint128'
+      kernwin.hpp            btoa128
+  [1] unmappable parameter type 'merge_node_hlpfunc_creator_t'
+      merge.hpp              create_nodeval_merge_handler
+  [1] unmappable parameter type 'qstring'
+      moves.hpp              bookmarks_t_set_desc
+  [1] declared but not exported
+      pro.h                  memicmp
+

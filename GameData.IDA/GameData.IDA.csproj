@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>GameData.IDA</AssemblyName>
+    <RootNamespace>GameData.IDA</RootNamespace>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <BaseOutputPath>..\build\</BaseOutputPath>
+    <OutputPath>$(BaseOutputPath)Release\GameData.IDA</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <!--
+      CS1591: the generated bindings document themselves with the original C declaration.
+      CS8981: IDA's type names are lower-case C identifiers and are kept verbatim so a signature
+              here can be read against the SDK header it came from.
+    -->
+    <NoWarn>$(NoWarn);CS1591;CS8981</NoWarn>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GameData.Tier0\GameData.Tier0.csproj" />
+  </ItemGroup>
+
+</Project>

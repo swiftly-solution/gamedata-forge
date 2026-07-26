@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\GameData.Tier0\GameData.Tier0.csproj" />
     <ProjectReference Include="..\GameData.DepotDownloader\GameData.DepotDownloader.csproj" />
+    <ProjectReference Include="..\GameData.IDA\GameData.IDA.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
