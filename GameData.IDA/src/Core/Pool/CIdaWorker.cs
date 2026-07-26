@@ -109,6 +109,7 @@ internal static class CIdaWorker
                 job.Id,
                 Functions: ida.FunctionCount,
                 Segments: ida.SegmentCount,
+                Strings: ida.StringCount,
                 Milliseconds: clock.ElapsedMilliseconds);
 
             ida.Close(job.Save);

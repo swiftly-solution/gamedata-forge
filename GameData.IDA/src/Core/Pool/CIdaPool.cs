@@ -89,7 +89,7 @@ internal sealed class CIdaPool : IIdaPool, IDisposable
 
         for (int i = 0; i < results.Length; i++)
         {
-            results[i] ??= new IdaBatchItem(paths[i], false, 0, 0, TimeSpan.Zero,
+            results[i] ??= new IdaBatchItem(paths[i], false, 0, 0, 0, TimeSpan.Zero,
                 "No worker was available to analyze this file.");
         }
 
@@ -110,7 +110,7 @@ internal sealed class CIdaPool : IIdaPool, IDisposable
 
             if (!worker.IsAlive && !Respawn(worker))
             {
-                results[index] = new IdaBatchItem(path, false, 0, 0, TimeSpan.Zero,
+                results[index] = new IdaBatchItem(path, false, 0, 0, 0, TimeSpan.Zero,
                     $"Worker {worker.Index} could not be restarted.");
                 continue;
             }
@@ -326,7 +326,7 @@ internal sealed class CIdaPool : IIdaPool, IDisposable
 
                         case IdaProtocolKind.Done:
                             return new IdaBatchItem(full, true, message.Functions, message.Segments,
-                                TimeSpan.FromMilliseconds(message.Milliseconds), null);
+                                message.Strings, TimeSpan.FromMilliseconds(message.Milliseconds), null);
 
                         case IdaProtocolKind.Failed:
                             return Failed(full, message.Message ?? "The worker did not say why.");
@@ -352,7 +352,7 @@ internal sealed class CIdaPool : IIdaPool, IDisposable
         }
 
         private IdaBatchItem Failed(string path, string error)
-            => new(path, false, 0, 0, TimeSpan.Zero, error);
+            => new(path, false, 0, 0, 0, TimeSpan.Zero, error);
 
         private WorkerMessage? ReadUntil(params string[] kinds)
         {

@@ -67,6 +67,7 @@ internal sealed record WorkerMessage(
     [property: JsonPropertyName("ea")] string? Address = null,
     [property: JsonPropertyName("funcs")] int Functions = 0,
     [property: JsonPropertyName("segs")] int Segments = 0,
+    [property: JsonPropertyName("strs")] int Strings = 0,
     [property: JsonPropertyName("ms")] long Milliseconds = 0,
     [property: JsonPropertyName("message")] string? Message = null);
 

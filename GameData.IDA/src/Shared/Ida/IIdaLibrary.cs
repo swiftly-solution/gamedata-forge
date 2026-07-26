@@ -22,6 +22,8 @@ public interface IIdaLibrary
 
     int SegmentCount { get; }
 
+    int StringCount { get; }
+
     void Close(bool save = false);
 
     bool MakeSignatures(bool onlyPattern = false);

@@ -121,7 +121,7 @@ internal static class CIdaCommands
             if (result.Succeeded)
             {
                 ctx.Print($"  {name}  {result.Functions,6} functions  {result.Segments,4} segments  " +
-                          $"{result.Elapsed.TotalSeconds,7:F1}s");
+                          $"{result.Strings,6} strings  {result.Elapsed.TotalSeconds,7:F1}s");
             }
             else
             {
@@ -299,7 +299,8 @@ internal static class CIdaCommands
             return;
         }
 
-        ctx.Print($"Opened. {ida.FunctionCount} functions, {ida.SegmentCount} segments.");
+        ctx.Print($"Opened. {ida.FunctionCount} functions, {ida.SegmentCount} segments, " +
+                  $"{ida.StringCount} strings.");
     }
 
     private static void Close(CommandContext ctx)

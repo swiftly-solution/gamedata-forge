@@ -79,6 +79,11 @@ internal sealed unsafe class CIdaLibrary : IIdaLibrary
             RunAnalysis(onProgress!);
         }
 
+        if (runAutoAnalysis)
+        {
+            Ida.build_strlist();
+        }
+
         return 0;
     }
 
@@ -163,6 +168,15 @@ internal sealed unsafe class CIdaLibrary : IIdaLibrary
         {
             RequireDatabase();
             return Ida.get_segm_qty();
+        }
+    }
+
+    public int StringCount
+    {
+        get
+        {
+            RequireDatabase();
+            return (int)Ida.get_strlist_qty();
         }
     }
 

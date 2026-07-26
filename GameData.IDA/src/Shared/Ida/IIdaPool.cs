@@ -5,6 +5,7 @@ public sealed record IdaBatchItem(
     bool Succeeded,
     int Functions,
     int Segments,
+    int Strings,
     TimeSpan Elapsed,
     string? Error);
 
